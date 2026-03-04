@@ -20,7 +20,7 @@ class DiscoveredDevice {
 class DeviceDiscoveryService {
   Future<List<DiscoveredDevice>> discover({Duration timeout = const Duration(seconds: 4)}) async {
     if (kIsWeb) {
-      throw UnsupportedError('Use Manual IP on web.');
+      throw UnsupportedError('Discovery is not available on web yet. Use Manual IP.');
     }
 
     final client = MDnsClient();

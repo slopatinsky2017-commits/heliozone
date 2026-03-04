@@ -70,7 +70,7 @@ class _DeviceSelectionScreenState extends State<DeviceSelectionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Use Manual IP to access your controller on web.'),
+              const Text('Discovery is not available on web yet. Use Manual IP.'),
               const SizedBox(height: 12),
               TextField(
                 controller: _manualIpController,

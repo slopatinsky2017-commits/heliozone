@@ -1,13 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'theme/theme.dart';
-import 'theme/tokens.dart';
-import 'widgets/app_scaffold.dart';
-import 'widgets/hz_card.dart';
-import 'widgets/hz_metric_chip.dart';
-import 'widgets/hz_section_header.dart';
-import 'widgets/hz_slider_tile.dart';
-import 'widgets/mini_chart_placeholder.dart';
 
 void main() {
   runApp(const HelioZoneApp());
@@ -18,10 +10,28 @@ class HelioZoneApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const bg = Color(0xFF0B1117);
+    const surface = Color(0xFF141C25);
+    const accent = Color(0xFF38D39F);
+
     return MaterialApp(
       title: 'HelioZone',
       debugShowCheckedModeBanner: false,
-      theme: HZTheme.dark(),
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: bg,
+        colorScheme: const ColorScheme.dark(
+          primary: accent,
+          secondary: Color(0xFF54A4FF),
+          surface: surface,
+        ),
+        cardTheme: const CardThemeData(
+          color: surface,
+          elevation: 0,
+          margin: EdgeInsets.zero,
+        ),
+      ),
       home: const AppShell(),
     );
   }
@@ -36,6 +46,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _tabIndex = 0;
+
   static const _titles = ['Home', 'Zones', 'Control', 'Sun', 'Analytics'];
 
   @override
@@ -48,16 +59,24 @@ class _AppShellState extends State<AppShell> {
       const AnalyticsTab(),
     ];
 
-    return HZAppScaffold(
-      title: _titles[_tabIndex],
-      selectedIndex: _tabIndex,
-      onDestinationSelected: (value) => setState(() => _tabIndex = value),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 220),
-        child: KeyedSubtree(
-          key: ValueKey(_tabIndex),
+    return Scaffold(
+      appBar: AppBar(title: Text(_titles[_tabIndex])),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: pages[_tabIndex],
         ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tabIndex,
+        onDestinationSelected: (value) => setState(() => _tabIndex = value),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.grid_view_rounded), label: 'Zones'),
+          NavigationDestination(icon: Icon(Icons.tune_rounded), label: 'Control'),
+          NavigationDestination(icon: Icon(Icons.wb_twilight_rounded), label: 'Sun'),
+          NavigationDestination(icon: Icon(Icons.analytics_outlined), label: 'Analytics'),
+        ],
       ),
     );
   }
@@ -72,173 +91,134 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   int _refreshCount = 0;
-  final _ipCtrl = TextEditingController();
-
-  @override
-  void dispose() {
-    _ipCtrl.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final zoneCards = [
+      _ZoneLiveStatus(
+        zoneName: 'Zone 1',
+        ppfd: 412,
+        dli: 24.8,
+        brightness: 74,
+        sunPhase: 'day',
+        cloudFactor: 0.88,
+      ),
+      _ZoneLiveStatus(
+        zoneName: 'Zone 2',
+        ppfd: 285,
+        dli: 16.9,
+        brightness: 52,
+        sunPhase: 'sunrise',
+        cloudFactor: 0.93,
+      ),
+    ];
+
     return ListView(
       children: [
-        _heroHeader(),
-        const SizedBox(height: HZTokens.s3),
-        _manualIpCard(),
-        const SizedBox(height: HZTokens.s4),
-        HZSectionHeader(
-          title: 'Zone Live Status',
-          subtitle: 'Real-time mock telemetry • update #$_refreshCount',
-          trailing: FilledButton.icon(
-            onPressed: () => setState(() => _refreshCount++),
-            icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Refresh'),
-          ),
-        ),
-        const SizedBox(height: HZTokens.s3),
-        const _ZoneLiveCard(
-          name: 'Zone 1',
-          ppfd: '418 µmol/m²/s',
-          dli: '25.2 mol/m²/day',
-          brightness: '76%',
-          phase: 'day',
-          cloud: '0.89',
-        ),
-        const SizedBox(height: HZTokens.s3),
-        const _ZoneLiveCard(
-          name: 'Zone 2',
-          ppfd: '292 µmol/m²/s',
-          dli: '17.3 mol/m²/day',
-          brightness: '54%',
-          phase: 'sunrise',
-          cloud: '0.93',
-        ),
-      ],
-    );
-  }
-
-  Widget _heroHeader() {
-    return HZCard(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(HZTokens.rMd),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF1A2F2C), Color(0xFF1A2431)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        padding: const EdgeInsets.all(HZTokens.s4),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(HZTokens.s3),
-              decoration: BoxDecoration(
-                color: const Color(0x332FD9A8),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(Icons.energy_savings_leaf, color: HZTokens.mint),
-            ),
-            const SizedBox(width: HZTokens.s3),
-            Expanded(
+        if (kIsWeb)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('HelioZone', style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 4),
-                  Text('Industrial Horticulture Control', style: Theme.of(context).textTheme.bodySmall),
+                children: const [
+                  Text(
+                    'Discovery is not available on web yet. Use Manual IP.',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 10),
+                  _ManualIpRow(),
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                _Badge(text: 'AUTO MODE', color: HZTokens.cyan),
-                SizedBox(height: 6),
-                _Badge(text: 'CONNECTED', color: HZTokens.mint),
-              ],
-            )
+          ),
+        if (kIsWeb) const SizedBox(height: 12),
+        Row(
+          children: [
+            Text('Zone Live Status', style: Theme.of(context).textTheme.titleMedium),
+            const Spacer(),
+            FilledButton.icon(
+              onPressed: () => setState(() => _refreshCount++),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Refresh'),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _manualIpCard() {
-    return HZCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Controller Access', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: HZTokens.s2),
-          Text(
-            'Use Manual IP for direct access on web (discovery support comes later).',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(height: HZTokens.s3),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _ipCtrl,
-                  decoration: const InputDecoration(hintText: '192.168.1.44'),
-                ),
-              ),
-              const SizedBox(width: HZTokens.s2),
-              FilledButton(onPressed: () {}, child: const Text('Connect')),
-            ],
-          ),
-        ],
-      ),
+        const SizedBox(height: 10),
+        Text('Mock update #$_refreshCount', style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 10),
+        ...zoneCards.map((c) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: c,
+            )),
+      ],
     );
   }
 }
 
-class _ZoneLiveCard extends StatelessWidget {
-  const _ZoneLiveCard({
-    required this.name,
-    required this.ppfd,
-    required this.dli,
-    required this.brightness,
-    required this.phase,
-    required this.cloud,
-  });
-
-  final String name;
-  final String ppfd;
-  final String dli;
-  final String brightness;
-  final String phase;
-  final String cloud;
+class _ManualIpRow extends StatelessWidget {
+  const _ManualIpRow();
 
   @override
   Widget build(BuildContext context) {
-    return HZCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(name, style: Theme.of(context).textTheme.titleMedium),
-              const Spacer(),
-              const _Badge(text: 'flowers', color: HZTokens.mint),
-            ],
+    return Row(
+      children: [
+        const Expanded(
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Manual IP (e.g. 192.168.1.44)',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
           ),
-          const SizedBox(height: HZTokens.s3),
-          Wrap(
-            spacing: HZTokens.s2,
-            runSpacing: HZTokens.s2,
-            children: [
-              HZMetricChip(icon: Icons.wb_iridescent_rounded, label: 'PPFD', value: ppfd),
-              HZMetricChip(icon: Icons.today_rounded, label: 'DLI', value: dli),
-              HZMetricChip(icon: Icons.light_mode_rounded, label: 'Brightness', value: brightness),
-              HZMetricChip(icon: Icons.wb_twilight_rounded, label: 'Phase', value: phase),
-              HZMetricChip(icon: Icons.cloud_rounded, label: 'Cloud', value: cloud),
-            ],
-          ),
-        ],
+        ),
+        const SizedBox(width: 10),
+        OutlinedButton(onPressed: null, child: const Text('Connect')),
+      ],
+    );
+  }
+}
+
+class _ZoneLiveStatus extends StatelessWidget {
+  const _ZoneLiveStatus({
+    required this.zoneName,
+    required this.ppfd,
+    required this.dli,
+    required this.brightness,
+    required this.sunPhase,
+    required this.cloudFactor,
+  });
+
+  final String zoneName;
+  final int ppfd;
+  final double dli;
+  final int brightness;
+  final String sunPhase;
+  final double cloudFactor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(zoneName, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 18,
+              runSpacing: 8,
+              children: [
+                Text('PPFD: $ppfd µmol/m²/s'),
+                Text('DLI: ${dli.toStringAsFixed(1)} mol/m²/day'),
+                Text('Brightness: $brightness%'),
+                Text('Sun phase: $sunPhase'),
+                Text('Cloud factor: ${cloudFactor.toStringAsFixed(2)}'),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -249,39 +229,33 @@ class ZonesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const zones = [
-      ('Zone 1', 'seedling', 260, 14.4),
-      ('Zone 2', 'vegetative', 420, 24.0),
-      ('Zone 3', 'flowering', 620, 33.6),
+    final zones = const [
+      ('Zone 1', 'flowers', 'seedling'),
+      ('Zone 2', 'flowers', 'vegetative'),
+      ('Zone 3', 'flowers', 'flowering'),
     ];
 
     return Column(
       children: [
-        HZSectionHeader(
-          title: 'Zones',
-          subtitle: 'Culture: flowers',
-          trailing: FilledButton.icon(onPressed: () {}, icon: const Icon(Icons.add), label: const Text('Add zone')),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton.icon(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+            label: const Text('Add zone'),
+          ),
         ),
-        const SizedBox(height: HZTokens.s3),
+        const SizedBox(height: 10),
         Expanded(
           child: ListView.separated(
             itemCount: zones.length,
-            separatorBuilder: (_, __) => const SizedBox(height: HZTokens.s3),
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (_, i) {
               final z = zones[i];
-              return HZCard(
+              return Card(
                 child: ListTile(
-                  contentPadding: EdgeInsets.zero,
                   title: Text(z.$1),
-                  subtitle: Text('flowers • target ${z.$3} PPFD • DLI ${z.$4.toStringAsFixed(1)}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _Badge(text: z.$2, color: HZTokens.amber),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.chevron_right_rounded),
-                    ],
-                  ),
+                  subtitle: Text('Culture: ${z.$2} • Stage: ${z.$3}'),
                 ),
               );
             },
@@ -306,21 +280,34 @@ class _ControlTabState extends State<ControlTab> {
   double red = 52;
   double farRed = 34;
 
+  Widget _slider(String label, double value, ValueChanged<double> onChanged) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$label: ${value.toStringAsFixed(0)}%'),
+            Slider(value: value, min: 0, max: 100, onChanged: onChanged),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        const HZSectionHeader(title: 'Lighting Control', subtitle: 'Premium channel tuning'),
-        const SizedBox(height: HZTokens.s3),
-        HZSliderTile(icon: Icons.power_settings_new_rounded, label: 'Master dimmer', value: master, onChanged: (v) => setState(() => master = v)),
-        const SizedBox(height: HZTokens.s3),
-        HZSliderTile(icon: Icons.light_mode_rounded, label: 'White', value: white, onChanged: (v) => setState(() => white = v)),
-        const SizedBox(height: HZTokens.s3),
-        HZSliderTile(icon: Icons.water_drop_rounded, label: 'Blue', value: blue, onChanged: (v) => setState(() => blue = v)),
-        const SizedBox(height: HZTokens.s3),
-        HZSliderTile(icon: Icons.local_fire_department_rounded, label: 'Red', value: red, onChanged: (v) => setState(() => red = v)),
-        const SizedBox(height: HZTokens.s3),
-        HZSliderTile(icon: Icons.nightlight_round, label: 'Far-Red', value: farRed, onChanged: (v) => setState(() => farRed = v)),
+        _slider('Master dimmer', master, (v) => setState(() => master = v)),
+        const SizedBox(height: 10),
+        _slider('White', white, (v) => setState(() => white = v)),
+        const SizedBox(height: 10),
+        _slider('Blue', blue, (v) => setState(() => blue = v)),
+        const SizedBox(height: 10),
+        _slider('Red', red, (v) => setState(() => red = v)),
+        const SizedBox(height: 10),
+        _slider('Far-Red', farRed, (v) => setState(() => farRed = v)),
       ],
     );
   }
@@ -331,31 +318,35 @@ class SunTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const intensity = 0.74;
+    const intensity = 72.0;
+    const curve1 = 0.22;
+    const curve2 = 0.46;
+    const curve3 = 0.72;
+    const curve4 = 0.88;
+
     return ListView(
       children: [
-        const HZSectionHeader(title: 'Live Sun', subtitle: 'Dynamic model preview'),
-        const SizedBox(height: HZTokens.s3),
-        HZCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Intensity ${(intensity * 100).toStringAsFixed(0)}%', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: HZTokens.s3),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: const LinearProgressIndicator(value: intensity, minHeight: 12),
-              ),
-              const SizedBox(height: HZTokens.s3),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [Text('Sunrise 06:00'), Text('Sunset 18:00')],
-              ),
-              const SizedBox(height: HZTokens.s4),
-              const Text('Curve placeholder'),
-              const SizedBox(height: HZTokens.s2),
-              const MiniChartPlaceholder(),
-            ],
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Live Sun', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 12),
+                Text('Intensity: ${intensity.toStringAsFixed(0)}%'),
+                const SizedBox(height: 10),
+                const Text('Curve placeholder'),
+                const SizedBox(height: 8),
+                const LinearProgressIndicator(value: curve1),
+                const SizedBox(height: 6),
+                const LinearProgressIndicator(value: curve2),
+                const SizedBox(height: 6),
+                const LinearProgressIndicator(value: curve3),
+                const SizedBox(height: 6),
+                const LinearProgressIndicator(value: curve4),
+              ],
+            ),
           ),
         ),
       ],
@@ -368,79 +359,33 @@ class AnalyticsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const kpis = [
-      ('Today DLI', '22.4', 'mol/m²/day', Icons.today_rounded),
-      ('Avg PPFD', '351', 'µmol/m²/s', Icons.wb_iridescent_rounded),
-      ('Photoperiod', '16.0', 'hours', Icons.schedule_rounded),
-      ('Peak Brightness', '92', '%', Icons.bolt_rounded),
+    final metrics = const [
+      ('Today DLI', '21.9 mol/m²/day'),
+      ('Avg PPFD', '342 µmol/m²/s'),
+      ('Photoperiod hours', '16.0 h'),
+      ('Peak brightness', '91 %'),
     ];
 
-    return ListView(
-      children: [
-        const HZSectionHeader(title: 'Analytics', subtitle: 'Daily performance snapshot'),
-        const SizedBox(height: HZTokens.s3),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: kpis.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: HZTokens.s3,
-            mainAxisSpacing: HZTokens.s3,
-            childAspectRatio: 1.45,
-          ),
-          itemBuilder: (_, i) => HZCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(kpis[i].$4 as IconData, color: HZTokens.cyan),
-                const SizedBox(height: HZTokens.s2),
-                Text(kpis[i].$1 as String, style: Theme.of(context).textTheme.bodySmall),
-                const SizedBox(height: 3),
-                Text('${kpis[i].$2} ${kpis[i].$3}', style: Theme.of(context).textTheme.titleMedium),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: HZTokens.s3),
-        const HZCard(
+    return GridView.builder(
+      itemCount: metrics.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 1.6,
+      ),
+      itemBuilder: (_, i) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('7-day trend'),
-              SizedBox(height: HZTokens.s2),
-              MiniChartPlaceholder(),
+              Text(metrics[i].$1, style: Theme.of(context).textTheme.bodyMedium),
+              const SizedBox(height: 8),
+              Text(metrics[i].$2, style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
-        )
-      ],
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({required this.text, required this.color});
-
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.13),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withOpacity(0.45)),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
         ),
       ),
     );
