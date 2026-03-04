@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 
 class HzTokens {
-  static const bgA = Color(0xFF05070C);
-  static const bgB = Color(0xFF0A111C);
-  static const bgC = Color(0xFF101A2A);
-  static const panel = Color(0xAA141E2E);
-  static const border = Color(0x33DCE8FF);
+  static const bg0 = Color(0xFF06090F);
+  static const bg1 = Color(0xFF0B111B);
+  static const bg2 = Color(0xFF111A28);
+  static const glass = Color(0x331A2534);
+  static const border = Color(0x44C8D6EA);
 
-  static const amber = Color(0xFFFFB554);
-  static const amberBright = Color(0xFFFFC978);
-  static const cyan = Color(0xFF62D6FF);
-  static const ww = Color(0xFFFFEBC9);
-  static const red660 = Color(0xFFFF5D5D);
-  static const red730 = Color(0xFFC33A46);
-  static const success = Color(0xFF40E0A8);
+  static const amber = Color(0xFFFFB347);
+  static const amberSoft = Color(0x66FFB347);
+  static const cyan = Color(0xFF63D4FF);
+  static const whiteWarm = Color(0xFFFFF3D6);
+  static const red660 = Color(0xFFFF5A5A);
+  static const red730 = Color(0xFFB7363B);
 
   static const rSm = 12.0;
   static const rMd = 18.0;
   static const rLg = 26.0;
-  static const rXl = 32.0;
 
   static const s1 = 4.0;
   static const s2 = 8.0;
@@ -27,28 +25,15 @@ class HzTokens {
   static const s5 = 20.0;
   static const s6 = 24.0;
 
-  static const dFast = Duration(milliseconds: 160);
+  static const dFast = Duration(milliseconds: 180);
   static const dMed = Duration(milliseconds: 280);
   static const dSlow = Duration(milliseconds: 900);
 
-  static const cosmicGradient = LinearGradient(
+  static const cosmicBg = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [bgA, bgB, bgC],
+    colors: [bg0, bg1, bg2],
   );
-
-  static List<BoxShadow> amberGlow([double o = 0.28]) => [
-        BoxShadow(color: amber.withOpacity(o), blurRadius: 24, spreadRadius: 0.2),
-      ];
-
-  // Backward-compatible aliases used across legacy widgets.
-  static const bg0 = bgA;
-  static const bg1 = bgB;
-  static const bg2 = bgC;
-  static const glass = panel;
-  static const whiteWarm = ww;
-  static const amberSoft = Color(0x66FFB554);
-  static const cosmicBg = cosmicGradient;
 
   static List<BoxShadow> softGlow(Color c) => [
         BoxShadow(color: c.withOpacity(0.30), blurRadius: 24, spreadRadius: 0.1),

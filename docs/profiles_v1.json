@@ -1,0 +1,150 @@
+{
+  "version": "1.0",
+  "profiles": [
+
+    {
+      "id": "tomato_seedling",
+      "crop": "tomato",
+      "stage": "seedling",
+      "photoperiod_hours": 16,
+      "target_dli": 15,
+      "target_ppfd": 260,
+      "spectrum": { "w": 0.55, "b": 0.20, "r": 0.22, "fr": 0.03 }
+    },
+
+    {
+      "id": "tomato_vegetative",
+      "crop": "tomato",
+      "stage": "vegetative",
+      "photoperiod_hours": 16,
+      "target_dli": 22,
+      "target_ppfd": 420,
+      "spectrum": { "w": 0.60, "b": 0.15, "r": 0.22, "fr": 0.03 }
+    },
+
+    {
+      "id": "tomato_fruiting",
+      "crop": "tomato",
+      "stage": "fruiting",
+      "photoperiod_hours": 16,
+      "target_dli": 30,
+      "target_ppfd": 620,
+      "spectrum": { "w": 0.55, "b": 0.10, "r": 0.30, "fr": 0.05 }
+    },
+
+
+    {
+      "id": "cucumber_seedling",
+      "crop": "cucumber",
+      "stage": "seedling",
+      "photoperiod_hours": 16,
+      "target_dli": 14,
+      "target_ppfd": 250,
+      "spectrum": { "w": 0.55, "b": 0.20, "r": 0.22, "fr": 0.03 }
+    },
+
+    {
+      "id": "cucumber_vegetative",
+      "crop": "cucumber",
+      "stage": "vegetative",
+      "photoperiod_hours": 16,
+      "target_dli": 24,
+      "target_ppfd": 450,
+      "spectrum": { "w": 0.60, "b": 0.15, "r": 0.22, "fr": 0.03 }
+    },
+
+    {
+      "id": "cucumber_fruiting",
+      "crop": "cucumber",
+      "stage": "fruiting",
+      "photoperiod_hours": 16,
+      "target_dli": 32,
+      "target_ppfd": 650,
+      "spectrum": { "w": 0.55, "b": 0.10, "r": 0.30, "fr": 0.05 }
+    },
+
+
+    {
+      "id": "pepper_seedling",
+      "crop": "pepper",
+      "stage": "seedling",
+      "photoperiod_hours": 16,
+      "target_dli": 14,
+      "target_ppfd": 240,
+      "spectrum": { "w": 0.55, "b": 0.20, "r": 0.22, "fr": 0.03 }
+    },
+
+    {
+      "id": "pepper_vegetative",
+      "crop": "pepper",
+      "stage": "vegetative",
+      "photoperiod_hours": 16,
+      "target_dli": 22,
+      "target_ppfd": 400,
+      "spectrum": { "w": 0.60, "b": 0.15, "r": 0.22, "fr": 0.03 }
+    },
+
+    {
+      "id": "pepper_fruiting",
+      "crop": "pepper",
+      "stage": "fruiting",
+      "photoperiod_hours": 16,
+      "target_dli": 28,
+      "target_ppfd": 550,
+      "spectrum": { "w": 0.55, "b": 0.10, "r": 0.30, "fr": 0.05 }
+    },
+
+
+    {
+      "id": "eggplant_general",
+      "crop": "eggplant",
+      "stage": "general",
+      "photoperiod_hours": 16,
+      "target_dli": 26,
+      "target_ppfd": 520,
+      "spectrum": { "w": 0.58, "b": 0.15, "r": 0.24, "fr": 0.03 }
+    },
+
+    {
+      "id": "watermelon_general",
+      "crop": "watermelon",
+      "stage": "general",
+      "photoperiod_hours": 16,
+      "target_dli": 30,
+      "target_ppfd": 620,
+      "spectrum": { "w": 0.58, "b": 0.14, "r": 0.25, "fr": 0.03 }
+    },
+
+    {
+      "id": "melon_general",
+      "crop": "melon",
+      "stage": "general",
+      "photoperiod_hours": 16,
+      "target_dli": 28,
+      "target_ppfd": 580,
+      "spectrum": { "w": 0.58, "b": 0.14, "r": 0.25, "fr": 0.03 }
+    },
+
+
+    {
+      "id": "greens_general",
+      "crop": "greens",
+      "stage": "general",
+      "photoperiod_hours": 16,
+      "target_dli": 14,
+      "target_ppfd": 280,
+      "spectrum": { "w": 0.60, "b": 0.22, "r": 0.16, "fr": 0.02 }
+    },
+
+    {
+      "id": "flowers_general",
+      "crop": "flowers",
+      "stage": "general",
+      "photoperiod_hours": 16,
+      "target_dli": 20,
+      "target_ppfd": 380,
+      "spectrum": { "w": 0.55, "b": 0.18, "r": 0.24, "fr": 0.03 }
+    }
+
+  ]
+}
