@@ -5,10 +5,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "health_manager.h"
-<<<<<<< codex/create-architecture-for-heliozone-system
 #include "helio_controller.h"
-=======
->>>>>>> main
 #include "http_api.h"
 #include "led_controller.h"
 #include "light_regulator.h"
@@ -72,7 +69,7 @@ static void task_sun_loop(void *arg) {
 
         dli_manager_tick(ppfd, now_minutes);
         sun_engine_set_dli_scale(dli_manager_get_output_scale());
-        sun_engine_tick(now_minutes);
+        sun_engine_update(now_minutes);
         cloud_engine_tick();
 
         sun_engine_status_t sun;
@@ -81,7 +78,9 @@ static void task_sun_loop(void *arg) {
         sun_engine_get_config(&sun_cfg);
 
         float cloud_factor = cloud_engine_get_factor();
-        float cloudy_brightness = sun.brightness * cloud_factor;
+        float sun_curve_brightness =
+            sun.normalized_intensity * sun_cfg.midday_peak * 100.0f * sun.dli_scale;
+        float cloudy_brightness = clampf(sun_curve_brightness * cloud_factor, 0.0f, 100.0f);
         float regulated_brightness = light_regulator_update(ppfd, cloudy_brightness);
 
         float scale = 0.0f;
@@ -142,6 +141,7 @@ static void task_heartbeat(void *arg) {
                  dli.current_dli,
                  dli.target_dli,
                  telemetry.sun_phase);
+
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
@@ -166,11 +166,9 @@ void app_main(void) {
     time_manager_start();
     http_api_start();
 
-<<<<<<< codex/create-architecture-for-heliozone-system
+    // Start higher-level orchestration after base subsystems are up
     helio_controller_start();
 
-=======
->>>>>>> main
     xTaskCreate(task_sensor_loop, "task_sensor_loop", 4096, NULL, 5, NULL);
     xTaskCreate(task_sun_loop, "task_sun_loop", 4096, NULL, 5, NULL);
     xTaskCreate(task_heartbeat, "task_heartbeat", 3072, NULL, 3, NULL);

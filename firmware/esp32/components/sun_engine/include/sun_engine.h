@@ -5,7 +5,8 @@
 typedef struct {
     int sunrise_minutes;
     int sunset_minutes;
-    float max_intensity;
+    float max_intensity; // Legacy percent peak [0..100]
+    float midday_peak;   // Normalized peak [0..1]
     float ratio_white;
     float ratio_blue;
     float ratio_red;
@@ -20,10 +21,12 @@ typedef struct {
     float red;
     float far_red;
     float dli_scale;
+    float normalized_intensity;
 } sun_engine_status_t;
 
 void sun_engine_init(void);
-void sun_engine_tick(int now_minutes);
+void sun_engine_update(int time_of_day_minutes);
+void sun_engine_tick(int now_minutes); // Backward-compatible alias
 void sun_engine_set_dli_scale(float dli_scale);
 void sun_engine_get_config(sun_engine_config_t *out_config);
 bool sun_engine_set_config(const sun_engine_config_t *config);

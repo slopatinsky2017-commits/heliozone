@@ -101,6 +101,7 @@ static bool apply_command_json(const char *json, char *error_out, size_t error_o
         cJSON *sunrise = cJSON_GetObjectItem(sun_cfg_json, "sunrise_time");
         cJSON *sunset = cJSON_GetObjectItem(sun_cfg_json, "sunset_time");
         cJSON *max_intensity = cJSON_GetObjectItem(sun_cfg_json, "max_intensity");
+        cJSON *midday_peak = cJSON_GetObjectItem(sun_cfg_json, "midday_peak");
 
         if (cJSON_IsString(sunrise) && sunrise->valuestring != NULL) {
             if (!sun_engine_parse_hhmm(sunrise->valuestring, &cfg.sunrise_minutes)) {
@@ -118,6 +119,9 @@ static bool apply_command_json(const char *json, char *error_out, size_t error_o
         }
         if (cJSON_IsNumber(max_intensity)) {
             cfg.max_intensity = (float)max_intensity->valuedouble;
+        }
+        if (cJSON_IsNumber(midday_peak)) {
+            cfg.midday_peak = (float)midday_peak->valuedouble;
         }
         if (!sun_engine_set_config(&cfg)) {
             cJSON_Delete(root);

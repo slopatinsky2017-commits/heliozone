@@ -177,6 +177,7 @@ static void append_sun_config(cJSON *root, const sun_engine_config_t *cfg) {
     cJSON_AddStringToObject(config, "sunrise_time", sunrise);
     cJSON_AddStringToObject(config, "sunset_time", sunset);
     cJSON_AddNumberToObject(config, "max_intensity", cfg->max_intensity);
+    cJSON_AddNumberToObject(config, "midday_peak", cfg->midday_peak);
 
     cJSON *ratios = cJSON_AddObjectToObject(config, "channel_ratios");
     cJSON_AddNumberToObject(ratios, "white", cfg->ratio_white);
@@ -634,6 +635,7 @@ static esp_err_t sun_config_post_handler(httpd_req_t *req) {
     cJSON *sunrise = cJSON_GetObjectItem(root, "sunrise_time");
     cJSON *sunset = cJSON_GetObjectItem(root, "sunset_time");
     cJSON *max_intensity = cJSON_GetObjectItem(root, "max_intensity");
+    cJSON *midday_peak = cJSON_GetObjectItem(root, "midday_peak");
     cJSON *ratios = cJSON_GetObjectItem(root, "channel_ratios");
 
     if (cJSON_IsString(sunrise) && sunrise->valuestring != NULL) {
@@ -654,6 +656,9 @@ static esp_err_t sun_config_post_handler(httpd_req_t *req) {
 
     if (cJSON_IsNumber(max_intensity)) {
         cfg.max_intensity = (float)max_intensity->valuedouble;
+    }
+    if (cJSON_IsNumber(midday_peak)) {
+        cfg.midday_peak = (float)midday_peak->valuedouble;
     }
 
     if (cJSON_IsObject(ratios)) {
