@@ -5,6 +5,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "health_manager.h"
+<<<<<<< codex/create-architecture-for-heliozone-system
+#include "helio_controller.h"
+=======
+>>>>>>> main
 #include "http_api.h"
 #include "led_controller.h"
 #include "light_regulator.h"
@@ -162,6 +166,11 @@ void app_main(void) {
     time_manager_start();
     http_api_start();
 
+<<<<<<< codex/create-architecture-for-heliozone-system
+    helio_controller_start();
+
+=======
+>>>>>>> main
     xTaskCreate(task_sensor_loop, "task_sensor_loop", 4096, NULL, 5, NULL);
     xTaskCreate(task_sun_loop, "task_sun_loop", 4096, NULL, 5, NULL);
     xTaskCreate(task_heartbeat, "task_heartbeat", 3072, NULL, 3, NULL);
