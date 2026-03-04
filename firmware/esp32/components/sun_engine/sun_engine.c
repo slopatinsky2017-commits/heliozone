@@ -56,62 +56,23 @@ static void normalize_ratios(sun_engine_config_t *cfg) {
     cfg->ratio_far_red /= sum;
 }
 
-static bool calculate_day_progress(int now_minutes, float *out_progress) {
+static float calculate_normalized_intensity(int now_minutes) {
     int sunrise = s_config.sunrise_minutes;
     int sunset = s_config.sunset_minutes;
 
-    if (out_progress == NULL || sunset <= sunrise) {
-        return false;
+    if (sunset <= sunrise) {
+        return 0.0f;
     }
 
     if (now_minutes < sunrise || now_minutes > sunset) {
-        return false;
+        return 0.0f;
     }
 
-    float progress = (float)(now_minutes - sunrise) / (float)(sunset - sunrise);
-    *out_progress = clampf(progress, 0.0f, 1.0f);
-    return true;
-}
+    float day_progress = (float)(now_minutes - sunrise) / (float)(sunset - sunrise);
+    day_progress = clampf(day_progress, 0.0f, 1.0f);
 
-static float calculate_normalized_intensity_from_progress(float day_progress) {
-    // sunrise->0, midday->0.5, sunset->1
-    // cosine-based dome: 0 at sunrise/sunset, 1 at midday.
-    float centered = day_progress - 0.5f;
-    float intensity = cosf(centered * (float)M_PI);
-    return clampf(intensity, 0.0f, 1.0f);
-}
-
-static void calculate_dynamic_ratios(float day_progress, float *white, float *blue, float *red, float *far_red) {
-    float midday_bias = calculate_normalized_intensity_from_progress(day_progress);
-    float edge_bias = 1.0f - midday_bias;
-
-    // Sunrise/sunset: warmer spectrum (red/far-red heavier).
-    // Midday: cooler/fuller spectrum (white/blue heavier).
-    float w = 0.30f + 0.30f * midday_bias;
-    float b = 0.08f + 0.22f * midday_bias;
-    float r = 0.44f - 0.20f * midday_bias;
-    float fr = 0.18f - 0.12f * midday_bias;
-
-    // Blend with configured ratios to preserve compatibility/tuning behavior.
-    w = 0.7f * w + 0.3f * s_config.ratio_white;
-    b = 0.7f * b + 0.3f * s_config.ratio_blue;
-    r = 0.7f * r + 0.3f * s_config.ratio_red;
-    fr = 0.7f * fr + 0.3f * s_config.ratio_far_red;
-
-    float sum = w + b + r + fr;
-    if (sum <= 0.0001f) {
-        w = 0.40f;
-        b = 0.20f;
-        r = 0.30f;
-        fr = 0.10f;
-        sum = 1.0f;
-    }
-
-    *white = w / sum;
-    *blue = b / sum;
-    *red = r / sum;
-    *far_red = fr / sum;
-    (void)edge_bias;
+    // Smooth natural arc: 0 at sunrise/sunset, 1 at midday.
+    return 0.5f - 0.5f * cosf(2.0f * (float)M_PI * day_progress);
 }
 
 void sun_engine_init(void) {
@@ -128,30 +89,17 @@ void sun_engine_set_dli_scale(float dli_scale) {
 void sun_engine_update(int time_of_day_minutes) {
     s_status.now_minutes = time_of_day_minutes;
 
-    float day_progress = 0.0f;
-    float normalized_intensity = 0.0f;
-    if (calculate_day_progress(time_of_day_minutes, &day_progress)) {
-        normalized_intensity = calculate_normalized_intensity_from_progress(day_progress);
-    }
+    float normalized = calculate_normalized_intensity(time_of_day_minutes);
+    s_status.normalized_intensity = normalized;
 
-    s_status.normalized_intensity = normalized_intensity;
+    float peak_percent = clampf(s_config.midday_peak, 0.0f, 1.0f) * 100.0f;
+    float base = clampf(normalized * peak_percent, 0.0f, 100.0f);
 
-    float base_brightness = normalized_intensity * s_config.midday_peak * 100.0f;
-    s_status.brightness = clampf(base_brightness, 0.0f, 100.0f) * s_status.dli_scale;
-
-    float ratio_white = s_config.ratio_white;
-    float ratio_blue = s_config.ratio_blue;
-    float ratio_red = s_config.ratio_red;
-    float ratio_far_red = s_config.ratio_far_red;
-
-    if (normalized_intensity > 0.0f) {
-        calculate_dynamic_ratios(day_progress, &ratio_white, &ratio_blue, &ratio_red, &ratio_far_red);
-    }
-
-    s_status.white = s_status.brightness * ratio_white;
-    s_status.blue = s_status.brightness * ratio_blue;
-    s_status.red = s_status.brightness * ratio_red;
-    s_status.far_red = s_status.brightness * ratio_far_red;
+    s_status.brightness = base * s_status.dli_scale;
+    s_status.white = s_status.brightness * s_config.ratio_white;
+    s_status.blue = s_status.brightness * s_config.ratio_blue;
+    s_status.red = s_status.brightness * s_config.ratio_red;
+    s_status.far_red = s_status.brightness * s_config.ratio_far_red;
 }
 
 void sun_engine_tick(int now_minutes) {
@@ -183,6 +131,7 @@ bool sun_engine_set_config(const sun_engine_config_t *config) {
     sun_engine_config_t candidate = *config;
     candidate.max_intensity = clampf(candidate.max_intensity, 0.0f, 100.0f);
 
+    // Keep compatibility: either field can drive the peak.
     if (candidate.midday_peak <= 0.0f) {
         candidate.midday_peak = candidate.max_intensity / 100.0f;
     }

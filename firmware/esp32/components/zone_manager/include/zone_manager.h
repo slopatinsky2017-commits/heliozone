@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-#include "crop_profiles.h"
+#include "grow_profiles.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +17,7 @@ typedef struct {
 
 void zone_manager_init(void);
 bool zone_set_profile(int zone_id, const char *crop, const char *stage);
-const crop_profile_t *zone_get_profile(int zone_id);
+const grow_profile_t *zone_get_profile(int zone_id);
 const zone_profile_binding_t *zone_get_binding(int zone_id);
 
 #ifdef __cplusplus

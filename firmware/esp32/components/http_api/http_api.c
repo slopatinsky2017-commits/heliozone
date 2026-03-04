@@ -5,8 +5,6 @@
 
 #include "cJSON.h"
 #include "cloud_engine.h"
-#include "zone_manager.h"
-#include "crop_profiles.h"
 #include "device_identity.h"
 #include "dli_manager.h"
 #include "esp_http_server.h"
@@ -221,10 +219,6 @@ static esp_err_t health_get_handler(httpd_req_t *req) {
     cJSON_AddStringToObject(root, "device_id", device_identity_get_id());
     append_health_json(root);
 
-    const zone_profile_binding_t *zone0 = zone_get_binding(0);
-    cJSON_AddStringToObject(root, "active_crop", (zone0 != NULL) ? zone0->crop : "");
-    cJSON_AddStringToObject(root, "active_stage", (zone0 != NULL) ? zone0->stage : "");
-
     esp_err_t err = send_json(req, root);
     cJSON_Delete(root);
     return err;
@@ -304,149 +298,6 @@ static esp_err_t cloud_post_handler(httpd_req_t *req) {
     return err;
 }
 
-
-static bool parse_zone_id_from_uri(const char *uri, int *out_zone_id) {
-    if (uri == NULL || out_zone_id == NULL) {
-        return false;
-    }
-
-    int id = -1;
-    if (sscanf(uri, "/api/zones/%d/profile", &id) != 1) {
-        return false;
-    }
-    if (id < 0 || id >= ZONE_MANAGER_MAX_ZONES) {
-        return false;
-    }
-
-    *out_zone_id = id;
-    return true;
-}
-
-static esp_err_t crop_profiles_get_handler(httpd_req_t *req) {
-    cJSON *root = cJSON_CreateObject();
-    cJSON *arr = cJSON_AddArrayToObject(root, "profiles");
-
-    int count = crop_profiles_count();
-    for (int i = 0; i < count; ++i) {
-        const crop_profile_t *p = crop_profiles_get(i);
-        if (p == NULL) {
-            continue;
-        }
-
-        cJSON *item = cJSON_CreateObject();
-        cJSON_AddStringToObject(item, "crop", p->crop);
-        cJSON_AddStringToObject(item, "stage", p->stage);
-        cJSON_AddNumberToObject(item, "ppfd", p->ppfd);
-        cJSON_AddNumberToObject(item, "photoperiod_hours", p->photoperiod_hours);
-        cJSON_AddNumberToObject(item, "dli", p->dli);
-        cJSON_AddNumberToObject(item, "sunrise_ramp_minutes", p->sunrise_ramp_minutes);
-        cJSON_AddNumberToObject(item, "sunset_ramp_minutes", p->sunset_ramp_minutes);
-        cJSON_AddNumberToObject(item, "midday_peak", p->midday_peak);
-        cJSON_AddNumberToObject(item, "cloud_variability", p->cloud_variability);
-        cJSON_AddItemToArray(arr, item);
-    }
-
-    esp_err_t err = send_json(req, root);
-    cJSON_Delete(root);
-    return err;
-}
-
-static esp_err_t zone_profile_get_handler(httpd_req_t *req) {
-    int zone_id = -1;
-    if (!parse_zone_id_from_uri(req->uri, &zone_id)) {
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "invalid zone id");
-        return ESP_FAIL;
-    }
-
-    const zone_profile_binding_t *binding = zone_get_binding(zone_id);
-    if (binding == NULL || binding->crop[0] == '\0' || binding->stage[0] == '\0') {
-        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "zone profile not set");
-        return ESP_FAIL;
-    }
-
-    const crop_profile_t *profile = zone_get_profile(zone_id);
-
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "zone_id", zone_id);
-    cJSON_AddStringToObject(root, "crop", binding->crop);
-    cJSON_AddStringToObject(root, "stage", binding->stage);
-
-    if (profile != NULL) {
-        cJSON *resolved = cJSON_AddObjectToObject(root, "resolved");
-        cJSON_AddNumberToObject(resolved, "ppfd", profile->ppfd);
-        cJSON_AddNumberToObject(resolved, "photoperiod_hours", profile->photoperiod_hours);
-        cJSON_AddNumberToObject(resolved, "dli", profile->dli);
-        cJSON_AddNumberToObject(resolved, "sunrise_ramp_minutes", profile->sunrise_ramp_minutes);
-        cJSON_AddNumberToObject(resolved, "sunset_ramp_minutes", profile->sunset_ramp_minutes);
-        cJSON_AddNumberToObject(resolved, "midday_peak", profile->midday_peak);
-        cJSON_AddNumberToObject(resolved, "cloud_variability", profile->cloud_variability);
-    }
-
-    esp_err_t err = send_json(req, root);
-    cJSON_Delete(root);
-    return err;
-}
-
-static esp_err_t zone_profile_post_handler(httpd_req_t *req) {
-    if (require_bearer_auth(req) != ESP_OK) {
-        return ESP_FAIL;
-    }
-
-    int zone_id = -1;
-    if (!parse_zone_id_from_uri(req->uri, &zone_id)) {
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "invalid zone id");
-        return ESP_FAIL;
-    }
-
-    cJSON *root = NULL;
-    if (recv_json(req, &root) != ESP_OK) {
-        return ESP_FAIL;
-    }
-
-    cJSON *crop = cJSON_GetObjectItem(root, "crop");
-    cJSON *stage = cJSON_GetObjectItem(root, "stage");
-
-    if (!cJSON_IsString(crop) || crop->valuestring == NULL || !cJSON_IsString(stage) || stage->valuestring == NULL) {
-        cJSON_Delete(root);
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "crop and stage are required");
-        return ESP_FAIL;
-    }
-
-    char crop_name[32] = {0};
-    char stage_name[32] = {0};
-    snprintf(crop_name, sizeof(crop_name), "%s", crop->valuestring);
-    snprintf(stage_name, sizeof(stage_name), "%s", stage->valuestring);
-
-    if (!zone_set_profile(zone_id, crop_name, stage_name)) {
-        cJSON_Delete(root);
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "invalid crop/stage");
-        return ESP_FAIL;
-    }
-
-    cJSON_Delete(root);
-
-    const crop_profile_t *profile = zone_get_profile(zone_id);
-    cJSON *resp = cJSON_CreateObject();
-    cJSON_AddBoolToObject(resp, "ok", true);
-    cJSON_AddNumberToObject(resp, "zone_id", zone_id);
-    cJSON_AddStringToObject(resp, "crop", crop_name);
-    cJSON_AddStringToObject(resp, "stage", stage_name);
-    if (profile != NULL) {
-        cJSON *resolved = cJSON_AddObjectToObject(resp, "resolved");
-        cJSON_AddNumberToObject(resolved, "ppfd", profile->ppfd);
-        cJSON_AddNumberToObject(resolved, "photoperiod_hours", profile->photoperiod_hours);
-        cJSON_AddNumberToObject(resolved, "dli", profile->dli);
-        cJSON_AddNumberToObject(resolved, "sunrise_ramp_minutes", profile->sunrise_ramp_minutes);
-        cJSON_AddNumberToObject(resolved, "sunset_ramp_minutes", profile->sunset_ramp_minutes);
-        cJSON_AddNumberToObject(resolved, "midday_peak", profile->midday_peak);
-        cJSON_AddNumberToObject(resolved, "cloud_variability", profile->cloud_variability);
-    }
-
-    esp_err_t err = send_json(req, resp);
-    cJSON_Delete(resp);
-    return err;
-}
-
 static esp_err_t status_get_handler(httpd_req_t *req) {
     sensor_snapshot_t sensors = sensor_manager_get_snapshot();
     sun_engine_status_t sun_status;
@@ -487,10 +338,6 @@ static esp_err_t status_get_handler(httpd_req_t *req) {
     append_par_json(root);
     append_dli_json(root);
     append_health_json(root);
-
-    const zone_profile_binding_t *zone0 = zone_get_binding(0);
-    cJSON_AddStringToObject(root, "active_crop", (zone0 != NULL) ? zone0->crop : "");
-    cJSON_AddStringToObject(root, "active_stage", (zone0 != NULL) ? zone0->stage : "");
     append_cloud_json(root);
 
     esp_err_t err = send_json(req, root);
@@ -713,7 +560,7 @@ static esp_err_t stream_get_handler(httpd_req_t *req) {
 
             snprintf(payload,
                      sizeof(payload),
-                     "data: {\"ppfd\":%.2f,\"dli\":%.4f,\"target_ppfd\":%.2f,\"target_dli\":%.2f,\"power_percent\":%.2f,\"sun_phase\":\"%s\",\"uptime\":%u,\"wifi_rssi\":%d,\"cloud_factor\":%.3f,\"cloudiness\":%d,\"active_crop\":\"%s\",\"active_stage\":\"%s\",\"health\":{\"heap\":%u,\"last_sensor_ok\":%s,\"last_sensor_ok_age_seconds\":%u,\"last_ntp_sync\":%lld,\"ota_last_result\":\"%s\",\"degraded\":%s}}\n\n",
+                     "data: {\"ppfd\":%.2f,\"dli\":%.4f,\"target_ppfd\":%.2f,\"target_dli\":%.2f,\"power_percent\":%.2f,\"sun_phase\":\"%s\",\"uptime\":%u,\"wifi_rssi\":%d,\"cloud_factor\":%.3f,\"cloudiness\":%d,\"health\":{\"heap\":%u,\"last_sensor_ok\":%s,\"last_sensor_ok_age_seconds\":%u,\"last_ntp_sync\":%lld,\"ota_last_result\":\"%s\",\"degraded\":%s}}\n\n",
                      t.ppfd,
                      t.dli,
                      t.target_ppfd,
@@ -722,10 +569,8 @@ static esp_err_t stream_get_handler(httpd_req_t *req) {
                      t.sun_phase,
                      t.uptime_seconds,
                      t.wifi_rssi,
-                     t.cloud_factor,
+                     cloud_engine_get_factor(),
                      cloud_cfg.cloudiness,
-                     t.active_crop,
-                     t.active_stage,
                      h.free_heap_bytes,
                      h.last_sensor_ok ? "true" : "false",
                      h.last_sensor_ok_age_seconds,
@@ -916,7 +761,6 @@ static esp_err_t control_channels_post_handler(httpd_req_t *req) {
 
 void http_api_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
 
     if (!load_or_generate_auth_token()) {
@@ -947,9 +791,6 @@ void http_api_start(void) {
     httpd_uri_t health_uri = {.uri = "/api/v1/health", .method = HTTP_GET, .handler = health_get_handler};
     httpd_uri_t cloud_get_uri = {.uri = "/api/v1/cloud", .method = HTTP_GET, .handler = cloud_get_handler};
     httpd_uri_t cloud_post_uri = {.uri = "/api/v1/cloud", .method = HTTP_POST, .handler = cloud_post_handler};
-    httpd_uri_t crop_profiles_uri = {.uri = "/api/crop_profiles", .method = HTTP_GET, .handler = crop_profiles_get_handler};
-    httpd_uri_t zone_profile_get_uri = {.uri = "/api/zones/*/profile", .method = HTTP_GET, .handler = zone_profile_get_handler};
-    httpd_uri_t zone_profile_post_uri = {.uri = "/api/zones/*/profile", .method = HTTP_POST, .handler = zone_profile_post_handler};
 
     httpd_register_uri_handler(server, &status_uri);
     httpd_register_uri_handler(server, &power_uri);
@@ -969,9 +810,6 @@ void http_api_start(void) {
     httpd_register_uri_handler(server, &health_uri);
     httpd_register_uri_handler(server, &cloud_get_uri);
     httpd_register_uri_handler(server, &cloud_post_uri);
-    httpd_register_uri_handler(server, &crop_profiles_uri);
-    httpd_register_uri_handler(server, &zone_profile_get_uri);
-    httpd_register_uri_handler(server, &zone_profile_post_uri);
 
     ESP_LOGI(TAG, "HTTP API started");
 }

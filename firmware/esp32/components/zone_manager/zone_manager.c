@@ -17,7 +17,7 @@ bool zone_set_profile(int zone_id, const char *crop, const char *stage) {
         return false;
     }
 
-    const crop_profile_t *resolved = crop_profiles_find(crop, stage);
+    const grow_profile_t *resolved = grow_profiles_find(crop, stage);
     if (resolved == NULL) {
         return false;
     }
@@ -31,7 +31,7 @@ bool zone_set_profile(int zone_id, const char *crop, const char *stage) {
     return true;
 }
 
-const crop_profile_t *zone_get_profile(int zone_id) {
+const grow_profile_t *zone_get_profile(int zone_id) {
     if (!is_valid_zone(zone_id)) {
         return NULL;
     }
@@ -41,7 +41,7 @@ const crop_profile_t *zone_get_profile(int zone_id) {
         return NULL;
     }
 
-    return crop_profiles_find(binding->crop, binding->stage);
+    return grow_profiles_find(binding->crop, binding->stage);
 }
 
 const zone_profile_binding_t *zone_get_binding(int zone_id) {

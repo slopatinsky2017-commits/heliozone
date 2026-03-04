@@ -227,7 +227,7 @@ void mqtt_manager_publish_telemetry(const telemetry_data_t *telemetry) {
     char payload[512] = {0};
     snprintf(payload,
              sizeof(payload),
-             "{\"device_id\":\"%s\",\"ppfd\":%.2f,\"dli\":%.4f,\"target_ppfd\":%.2f,\"target_dli\":%.2f,\"power_percent\":%.2f,\"sun_phase\":\"%s\",\"uptime\":%u,\"wifi_rssi\":%d,\"cloud_factor\":%.3f,\"cloudiness\":%d,\"active_crop\":\"%s\",\"active_stage\":\"%s\"}",
+             "{\"device_id\":\"%s\",\"ppfd\":%.2f,\"dli\":%.4f,\"target_ppfd\":%.2f,\"target_dli\":%.2f,\"power_percent\":%.2f,\"sun_phase\":\"%s\",\"uptime\":%u,\"wifi_rssi\":%d,\"cloud_factor\":%.3f,\"cloudiness\":%d}",
              device_identity_get_id(),
              telemetry->ppfd,
              telemetry->dli,
@@ -237,10 +237,8 @@ void mqtt_manager_publish_telemetry(const telemetry_data_t *telemetry) {
              telemetry->sun_phase,
              telemetry->uptime_seconds,
              telemetry->wifi_rssi,
-             telemetry->cloud_factor,
-             cloud_cfg.cloudiness,
-             telemetry->active_crop,
-             telemetry->active_stage);
+             cloud_engine_get_factor(),
+             cloud_cfg.cloudiness);
 
     esp_mqtt_client_publish(s_client, s_telemetry_topic, payload, 0, 0, 0);
 }
