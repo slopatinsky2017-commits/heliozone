@@ -78,7 +78,8 @@ static void task_sun_loop(void *arg) {
         sun_engine_get_config(&sun_cfg);
 
         float cloud_factor = cloud_engine_get_factor();
-        float sun_curve_brightness = sun.normalized_intensity * sun_cfg.midday_peak * 100.0f * sun.dli_scale;
+        float sun_curve_brightness =
+            sun.normalized_intensity * sun_cfg.midday_peak * 100.0f * sun.dli_scale;
         float cloudy_brightness = clampf(sun_curve_brightness * cloud_factor, 0.0f, 100.0f);
         float regulated_brightness = light_regulator_update(ppfd, cloudy_brightness);
 
@@ -140,6 +141,7 @@ static void task_heartbeat(void *arg) {
                  dli.current_dli,
                  dli.target_dli,
                  telemetry.sun_phase);
+
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
@@ -164,6 +166,7 @@ void app_main(void) {
     time_manager_start();
     http_api_start();
 
+    // Start higher-level orchestration after base subsystems are up
     helio_controller_start();
 
     xTaskCreate(task_sensor_loop, "task_sensor_loop", 4096, NULL, 5, NULL);
