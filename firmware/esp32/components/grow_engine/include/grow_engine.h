@@ -1,13 +1,13 @@
 #pragma once
 
-#include "grow_profiles.h"
+#include "crop_profiles.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void grow_engine_init(void);
-void grow_engine_run(const grow_profile_t *profile);
+void grow_engine_run(const crop_profile_t *profile);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:multicast_dns/multicast_dns.dart';
 
 class DiscoveredDevice {
@@ -18,6 +19,10 @@ class DiscoveredDevice {
 
 class DeviceDiscoveryService {
   Future<List<DiscoveredDevice>> discover({Duration timeout = const Duration(seconds: 4)}) async {
+    if (kIsWeb) {
+      throw UnsupportedError('Discovery is not available on web yet. Use Manual IP.');
+    }
+
     final client = MDnsClient();
     await client.start();
 
@@ -68,7 +73,6 @@ class DeviceDiscoveryService {
       }
 
       if (found.isEmpty) {
-        // Fallback to expected Bonjour hostname if no service record is discovered.
         found['heliozone.local'] = const DiscoveredDevice(
           ipAddress: 'heliozone.local',
           hostname: 'heliozone.local',

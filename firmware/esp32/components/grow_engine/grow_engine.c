@@ -6,7 +6,7 @@ static const char *TAG = "grow_engine";
 
 void grow_engine_init(void) {}
 
-void grow_engine_run(const grow_profile_t *profile) {
+void grow_engine_run(const crop_profile_t *profile) {
     if (profile == NULL) {
         ESP_LOGW(TAG, "grow_engine_run called with NULL profile");
         return;

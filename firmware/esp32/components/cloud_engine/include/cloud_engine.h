@@ -9,8 +9,8 @@ extern "C" {
 typedef struct {
     bool enabled;
     int cloudiness;
-    float min_factor;
-    float max_factor;
+    float min_factor; // constrained to [0.6..1.0]
+    float max_factor; // constrained to [min_factor..1.0]
     int avg_interval_s;
 } cloud_engine_config_t;
 

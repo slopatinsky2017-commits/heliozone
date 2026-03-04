@@ -16,6 +16,7 @@
 #include "telemetry_manager.h"
 #include "time_manager.h"
 #include "wifi_manager.h"
+#include "zone_manager.h"
 
 static const char *TAG = "heliozone_main";
 
@@ -78,8 +79,7 @@ static void task_sun_loop(void *arg) {
         sun_engine_get_config(&sun_cfg);
 
         float cloud_factor = cloud_engine_get_factor();
-        float sun_curve_brightness =
-            sun.normalized_intensity * sun_cfg.midday_peak * 100.0f * sun.dli_scale;
+        float sun_curve_brightness = sun.normalized_intensity * sun_cfg.midday_peak * 100.0f * sun.dli_scale;
         float cloudy_brightness = clampf(sun_curve_brightness * cloud_factor, 0.0f, 100.0f);
         float regulated_brightness = light_regulator_update(ppfd, cloudy_brightness);
 
@@ -94,13 +94,18 @@ static void task_sun_loop(void *arg) {
         led_controller_set_channel_percent(LED_CHANNEL_FAR_RED, clampf(sun.far_red * scale, 0.0f, 100.0f));
         led_controller_set_power(regulated_brightness > 0.0f);
 
+        const zone_profile_binding_t *zone0 = zone_get_binding(0);
+
         telemetry_manager_update(ppfd,
                                  dli_manager_get_current(),
                                  light_regulator_get_target(),
                                  dli_manager_get_target(),
                                  regulated_brightness,
                                  detect_sun_phase(&sun_cfg, now_minutes),
-                                 wifi_manager_get_rssi());
+                                 wifi_manager_get_rssi(),
+                                 cloud_factor,
+                                 zone0 != NULL ? zone0->crop : "",
+                                 zone0 != NULL ? zone0->stage : "");
 
         health_manager_update();
 
@@ -141,7 +146,6 @@ static void task_heartbeat(void *arg) {
                  dli.current_dli,
                  dli.target_dli,
                  telemetry.sun_phase);
-
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
@@ -166,7 +170,6 @@ void app_main(void) {
     time_manager_start();
     http_api_start();
 
-    // Start higher-level orchestration after base subsystems are up
     helio_controller_start();
 
     xTaskCreate(task_sensor_loop, "task_sensor_loop", 4096, NULL, 5, NULL);
