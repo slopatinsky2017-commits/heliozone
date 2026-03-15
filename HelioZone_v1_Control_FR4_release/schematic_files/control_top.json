@@ -1,0 +1,10 @@
+{
+  "title": "HelioZone Control Top",
+  "blocks": [
+    "Power",
+    "ESP32-S3",
+    "Drivers",
+    "Connectors",
+    "Thermal Sensors"
+  ]
+}

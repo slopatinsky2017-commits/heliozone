@@ -1,0 +1,7 @@
+Physical_Output,Logical_Group,Logical_Channel,Driver_Path
+OUT1,CH1A,Main White,TPS92518HV U4 A
+OUT2,CH1B,Main White,TPS92518HV U4 B
+OUT3,CH2,Warm White,TPS92518HV U5 A
+OUT4,CH3,Blue 450 nm,TPS92518HV U5 B
+OUT5,CH4,Deep Red 660 nm,TPS92518HV U6 A
+OUT6,CH5,Far-Red 730 nm,TPS92518HV U6 B

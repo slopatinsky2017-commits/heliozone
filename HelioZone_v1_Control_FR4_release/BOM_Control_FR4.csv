@@ -1,0 +1,8 @@
+MPN,Description,Qty,Vendor
+ESP32-S3-WROOM-1-N16R8,MCU module,1,Espressif
+TPS92518HVDRCR,Dual LED driver,3,TI
+LM5164,48V->5V buck,1,TI
+TLV75533P,3.3V LDO,1,TI
+JST-VH-2,Power input conn,1,JST
+JST-VH-4,LED output conn,3,JST
+JST-PH-3,Service header,1,JST

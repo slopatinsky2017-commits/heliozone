@@ -1,0 +1,9 @@
+Load,Current_A,Voltage_V,Power_W
+Main White CH1A,0.7,43.5,30.45
+Main White CH1B,0.7,43.5,30.45
+Warm White CH2,0.5,40.6,20.3
+Blue CH3,0.35,25.6,8.96
+Deep Red CH4,0.5,26.4,13.2
+Far Red CH5,0.35,13.2,4.62
+Control Board Aux,0.15,48.0,7.2
+Total Nominal,3.25,48.0,115.18

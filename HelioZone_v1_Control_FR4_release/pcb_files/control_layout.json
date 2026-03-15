@@ -1,0 +1,11 @@
+{
+  "board": {
+    "width_mm": 120,
+    "height_mm": 90
+  },
+  "drivers": 3,
+  "outputs": 6,
+  "inputs": {
+    "vin": 48
+  }
+}

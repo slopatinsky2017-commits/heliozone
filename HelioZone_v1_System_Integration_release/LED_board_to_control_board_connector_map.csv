@@ -1,0 +1,13 @@
+Control_Board,LED_Board,Signal
+Control J2.1,LED J1.3,CH1A+
+Control J2.2,LED J1.4,CH1A-
+Control J2.3,LED J1.5,CH1B+
+Control J2.4,LED J1.6,CH1B-
+Control J3.1,LED J1.7,CH2+
+Control J3.2,LED J1.8,CH2-
+Control J3.3,LED J2.1,CH3+
+Control J3.4,LED J2.2,CH3-
+Control J4.1,LED J2.3,CH4+
+Control J4.2,LED J2.4,CH4-
+Control J4.3,LED J2.5,CH5+
+Control J4.4,LED J2.6,CH5-

@@ -1,0 +1,9 @@
+{
+  "name": "HelioZone_v1_Control_FR4",
+  "tool": "EasyEDA Standard",
+  "version": "1.0",
+  "documents": [
+    "schematic_files/control_top.json",
+    "pcb_files/control_layout.json"
+  ]
+}
