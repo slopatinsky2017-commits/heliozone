@@ -1,0 +1,6 @@
+name,x_mm,y_mm,function
+J1,575,120,Power + outputs CH1A/CH1B/CH2
+J2,575,160,Outputs CH3/CH4/CH5
+J3,575,220,NTC and ID
+TP1,560,300,48V input test
+TP2,560,320,GND test

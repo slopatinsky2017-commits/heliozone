@@ -1,0 +1,12 @@
+{
+  "clearance_mm": 0.25,
+  "min_trace_mm": 0.3,
+  "power_trace_min_mm": 1.0,
+  "thermal_relief": false,
+  "annular_ring_mm": 0.2,
+  "min_drill_mm": 0.3,
+  "board_thickness_mm": 1.6,
+  "copper_oz": 2,
+  "soldermask": "white",
+  "finish": "ENIG"
+}

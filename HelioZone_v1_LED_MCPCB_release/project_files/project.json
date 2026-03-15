@@ -1,0 +1,9 @@
+{
+  "name": "HelioZone_v1_LED_MCPCB",
+  "tool": "EasyEDA Standard",
+  "version": "1.0",
+  "documents": [
+    "schematic_files/led_channel_sheet.json",
+    "pcb_files/led_mcpcb_layout.json"
+  ]
+}

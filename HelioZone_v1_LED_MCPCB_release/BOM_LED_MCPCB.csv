@@ -1,0 +1,9 @@
+MPN,Description,Qty,Approved_Vendor
+GE-3030WXXX-Q1B2D0-4,Main white LED 3030,210,TBD
+GC-3030WXXX-J2B2D0-4,Warm white LED 3030,42,TBD
+GT-3535B450-S1D0,Blue LED 450nm 3535,24,TBD
+GT-3535R660-S2F0,Deep red LED 660nm 3535,36,TBD
+GT-3535R730-S2D5,Far-red LED 730nm 3535,12,TBD
+JST-VH-8,Output connector,2,JST
+JST-PH-4,Sensor connector,1,JST
+NTC-10K-0603,NTC thermistor,2,Murata

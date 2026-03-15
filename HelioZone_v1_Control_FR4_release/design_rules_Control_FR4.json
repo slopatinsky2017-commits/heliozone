@@ -1,0 +1,11 @@
+{
+  "layers": 4,
+  "min_trace_mm": 0.127,
+  "min_clearance_mm": 0.127,
+  "power_trace_mm": 0.5,
+  "via_drill_mm": 0.2,
+  "board_thickness_mm": 1.6,
+  "soldermask": "green",
+  "finish": "ENIG",
+  "antenna_keepout": true
+}

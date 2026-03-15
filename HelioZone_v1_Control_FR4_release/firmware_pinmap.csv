@@ -1,0 +1,12 @@
+MCU_Pin,Function,Notes
+GPIO4,PWM_CH1A,Main White A dimming
+GPIO5,PWM_CH1B,Main White B dimming
+GPIO6,PWM_CH2,Warm White dimming
+GPIO7,PWM_CH3,Blue 450 dimming
+GPIO15,PWM_CH4,Deep Red dimming
+GPIO16,PWM_CH5,Far-red dimming
+GPIO9,NTC1_ADC,Remote NTC1
+GPIO10,NTC2_ADC,Remote NTC2
+GPIO11,NTC3_ADC,Onboard NTC
+GPIO43,UART_TX,Service console
+GPIO44,UART_RX,Service console

@@ -1,0 +1,4 @@
+point,x_mm,y_mm,description
+NTC1,560,240,Near center thermal monitor
+NTC2,560,260,Near edge thermal monitor
+TP_TH1,540,250,Analog readback pad

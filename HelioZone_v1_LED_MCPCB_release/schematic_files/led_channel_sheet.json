@@ -1,0 +1,12 @@
+{
+  "title": "HelioZone LED Board Channel Sheet",
+  "notes": "Logical channels and connector breakout",
+  "channels": [
+    "CH1A",
+    "CH1B",
+    "CH2",
+    "CH3",
+    "CH4",
+    "CH5"
+  ]
+}

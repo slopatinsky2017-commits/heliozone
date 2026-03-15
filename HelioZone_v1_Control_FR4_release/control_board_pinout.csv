@@ -1,0 +1,20 @@
+Connector,Pin,Signal,Description
+J1,1,VIN_48V,48V input +
+J1,2,PGND,Power return
+J2,1,OUT_CH1A+,Main White A +
+J2,2,OUT_CH1A-,Main White A -
+J2,3,OUT_CH1B+,Main White B +
+J2,4,OUT_CH1B-,Main White B -
+J3,1,OUT_CH2+,Warm White +
+J3,2,OUT_CH2-,Warm White -
+J3,3,OUT_CH3+,Blue +
+J3,4,OUT_CH3-,Blue -
+J4,1,OUT_CH4+,Deep Red +
+J4,2,OUT_CH4-,Deep Red -
+J4,3,OUT_CH5+,Far Red +
+J4,4,OUT_CH5-,Far Red -
+J5,1,NTC1,Remote thermistor 1
+J5,2,NTC2,Remote thermistor 2
+J6,1,UART_TX,Service TX
+J6,2,UART_RX,Service RX
+J6,3,GND,Service GND

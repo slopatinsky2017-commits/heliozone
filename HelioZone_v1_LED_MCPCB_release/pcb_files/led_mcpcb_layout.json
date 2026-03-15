@@ -1,0 +1,9 @@
+{
+  "board": {
+    "width_mm": 600,
+    "height_mm": 500,
+    "service_strip_mm": 50
+  },
+  "led_count": 324,
+  "mounting_holes": 6
+}
