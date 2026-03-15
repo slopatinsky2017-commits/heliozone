@@ -1,0 +1,29 @@
+{
+  "name": "HelioZone_v1_LED_MCPCB",
+  "format": "EasyEDA Professional",
+  "version": "1.0.0",
+  "units": "mm",
+  "documents": {
+    "pcb": "pcb.json",
+    "schematic": "schematic.json"
+  },
+  "board": {
+    "type": "Aluminum MCPCB",
+    "width_mm": 600.0,
+    "height_mm": 500.0,
+    "service_zone": {
+      "x_mm": 550.0,
+      "y_mm": 0.0,
+      "width_mm": 50.0,
+      "height_mm": 500.0
+    }
+  },
+  "channel_requirements": {
+    "Main White": 210,
+    "Warm White": 42,
+    "Blue 450nm": 24,
+    "Deep Red 660nm": 36,
+    "Far Red 730nm": 12
+  },
+  "generated_by": "Codex automated generator"
+}

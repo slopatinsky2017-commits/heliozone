@@ -1,0 +1,49 @@
+{
+  "easyeda_pro_document": {
+    "doc_type": "schematic",
+    "units": "mm",
+    "title": "HelioZone_v1 LED MCPCB",
+    "notes": "Channelized LED matrix schematic abstraction for EasyEDA Pro import package.",
+    "blocks": [
+      {
+        "name": "LED_MATRIX_18x18",
+        "instances": 324,
+        "channels": {
+          "Main White": 210,
+          "Warm White": 42,
+          "Blue 450nm": 24,
+          "Deep Red 660nm": 36,
+          "Far Red 730nm": 12
+        }
+      },
+      {
+        "name": "POWER_INPUT",
+        "pads": [
+          "VIN+",
+          "VIN-",
+          "CH_RETURN"
+        ]
+      },
+      {
+        "name": "NTC_SENSOR",
+        "pads": [
+          "NTC1_A",
+          "NTC1_B"
+        ]
+      }
+    ],
+    "nets": [
+      "CH_BLUE_450",
+      "CH_DEEP_RED_660",
+      "CH_FAR_RED_730",
+      "CH_MAIN_WHITE",
+      "CH_RETURN",
+      "CH_WARM_WHITE",
+      "NTC1_A",
+      "NTC1_B",
+      "THERMAL",
+      "VIN+",
+      "VIN-"
+    ]
+  }
+}
