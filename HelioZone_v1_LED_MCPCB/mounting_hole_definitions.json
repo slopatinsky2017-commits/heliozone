@@ -1,0 +1,68 @@
+{
+  "mounting_holes": [
+    {
+      "id": "MH1",
+      "x_mm": 10.0,
+      "y_mm": 10.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH2",
+      "x_mm": 540.0,
+      "y_mm": 10.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH3",
+      "x_mm": 10.0,
+      "y_mm": 490.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH4",
+      "x_mm": 540.0,
+      "y_mm": 490.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH5",
+      "x_mm": 275.0,
+      "y_mm": 10.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH6",
+      "x_mm": 275.0,
+      "y_mm": 490.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH7",
+      "x_mm": 10.0,
+      "y_mm": 250.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    },
+    {
+      "id": "MH8",
+      "x_mm": 540.0,
+      "y_mm": 250.0,
+      "drill_mm": 4.2,
+      "pad_diameter_mm": 8.0,
+      "plated": false
+    }
+  ]
+}
